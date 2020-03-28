@@ -1,6 +1,6 @@
 //1) Найти K-тый элемент в списке
 def getKElem (list: List[Int], k: Int): Option[Int] = (list, k) match {
-  case (head::_, 0) => Some (head)
+  case (head::_, 0) => head.
   case (_::tail, k) => getKElem(tail, k-1)
   case _ => None
   /*if (k == 0) Some(list.head)

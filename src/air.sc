@@ -1,3 +1,8 @@
+//package ru.philit.bigdata.vsu.other
+
+import scala.io.Source
+import scala.util.Try
+
 object airlines {
 
   case class Route(
@@ -38,6 +43,7 @@ object airlines {
   Метод должен вернуть Map с ключом из названия страны и значением - количество посещений, и посещенные аэропорты в виде списка.
   Считать нужно все страны кроме домашней страны и аэропортов домашней страны*/
   class Service(val frame: DataFrame) {
+    case class Output()
 
     def mergeAirlinesRoutes(airlines:Seq[Airline], routes: Seq[Route]): Seq[(Airline, Route)] = for {
       airline <- airlines
@@ -49,19 +55,26 @@ object airlines {
       (airline, route) <- airlines_and_routes
       airport <- airports
       if !airline.country.toLowerCase.equals(airport.country.toLowerCase()) && (
-        route.targetAirportCode.toLowerCase.equals(airline.iata.toLowerCase) || route.targetAirportCode.toLowerCase.equals(airline.icao.toLowerCase))
+        route.targetAirportCode.toLowerCase.equals(airline.iata.toLowerCase) ||
+          route.targetAirportCode.toLowerCase.equals(airline.icao.toLowerCase))
     } yield (airline, route, airport)
 
-    def countVisits(joined: Seq[(Airline, Route, Airport)], airline: String):Int = {
-      joined.flatMap(j => j._3.)
+    def countVisits(joined: Seq[(Airline, Route, Airport)], airline: String):Map[String, Int] = {
+      //joined.flatMap (j => Seq(j._3)).map(airpot => Seq(airpot.country, airpot))
+      joined.groupBy(j => j._3.country).map{
+        case (k, v) => (k, v.flatten{
+          case (air, _, _) => Seq(air).filter(_.name.equals(airline))
+        })
+      }.map {
+        case(k, v) => (k, v.length)
+      }
     }
 
-    def countryStat(airline: String): Map[String, Int] ={
-      val joinedData = mergeFull(mergeRoutesAirports(frame.routes, frame.airports), frame.airlines)
-
-      joinedData.groupBy(identity).mapValues(_.size)(airline)
+    def visitedAirports(joined: Seq[(Airline, Route, Airport)], airline: String):Seq[Airport] = {
+      joined.filter(j => j._1.name.equals(airline)).flatten{
+        case (_, _, airport) => Seq(airport)
+      }.distinct
     }
 
   }
-
 }

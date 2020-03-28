@@ -1,21 +1,6 @@
 import scala.collection.mutable.ListBuffer
 
 sealed trait Tree[+A]
-  /*//leaf and branch count
-  def size: Int
-
-  //leaf count
-  def count: Int
-
-  //Максимальное расстояние от корня до листа
-  def depth: Int
-
-  def map[B](f: A => B): Tree[B]
-
-  def filter(f: A => Boolean): Tree[A]
-
-  def fold[B](map: A => B)(reduce: (B, B) => B): B
-}*/
 
 case class Leaf[A](value: A) extends Tree[A]
 
@@ -48,9 +33,8 @@ object Tree {
     def filter(f: T => Boolean): Tree[T] = {
       def rebuild (r_tree: Tree[Option[T]]): Tree[Option[T]] = r_tree match {
         case Leaf (value) => if (f(value.get)) Leaf(value) else Leaf(None)
-        case Branch (left, right) => Branch(rebuild(left), rebuild(right))
+        case Branch (left, right) => left.
       }
-      ???
     }
 
     //case Cons(h, t) => t.foldLeft(f(acc, h))(f)
