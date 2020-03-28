@@ -1,8 +1,3 @@
-//package ru.philit.bigdata.vsu.other
-
-import scala.io.Source
-import scala.util.Try
-
 object airlines {
 
   case class Route(
@@ -38,12 +33,8 @@ object airlines {
                         airports: Seq[Airport],
                         countries: Map[String, String]
                       )
-  /*Задание: используя датасет из проекта написать класс-сервис с методом countryStat(airline: String).
-  Входной параметр - название авиакомпании или сокращение типа DME.
-  Метод должен вернуть Map с ключом из названия страны и значением - количество посещений, и посещенные аэропорты в виде списка.
-  Считать нужно все страны кроме домашней страны и аэропортов домашней страны*/
+
   class Service(val frame: DataFrame) {
-    case class Output()
 
     def mergeAirlinesRoutes(airlines:Seq[Airline], routes: Seq[Route]): Seq[(Airline, Route)] = for {
       airline <- airlines
@@ -60,20 +51,31 @@ object airlines {
     } yield (airline, route, airport)
 
     def countVisits(joined: Seq[(Airline, Route, Airport)], airline: String):Map[String, Int] = {
-      //joined.flatMap (j => Seq(j._3)).map(airpot => Seq(airpot.country, airpot))
-      joined.groupBy(j => j._3.country).map{
-        case (k, v) => (k, v.flatten{
-          case (air, _, _) => Seq(air).filter(_.name.equals(airline))
+      joined.groupBy(j => j._3.country).map {
+        case (k, v) => (k, v.flatten {
+          case (airline, _, _) => Seq(airline).filter(_.name.equals(airline))
         })
       }.map {
-        case(k, v) => (k, v.length)
+        case (k, v) => (k, v.length)
       }
     }
 
-    def visitedAirports(joined: Seq[(Airline, Route, Airport)], airline: String):Seq[Airport] = {
-      joined.filter(j => j._1.name.equals(airline)).flatten{
-        case (_, _, airport) => Seq(airport)
-      }.distinct
+    def getVisitedAirports(joined: Seq[(Airline, Route, Airport)], airline: String):Map[String, Seq[Airport]] = {
+      joined.groupBy(j => j._3.country).map {
+        case (k, v) => (k, v.filter(_._1.name.equals(airline)).distinct.flatten {
+          case (_, _, airport) => Seq(airport)
+        })
+      }
+    }
+
+    def countryStat(airline: String):Map[String, (Int, Seq[Airport])] = {
+      val joined = mergeFull(mergeAirlinesRoutes(frame.airlines, frame.routes), frame.airports)
+      val visitsCount = countVisits(joined, airline)
+      val visitedAirports = getVisitedAirports(joined, airline)
+
+      visitsCount.map{
+        case (k, v) => (k, (v, visitedAirports(k)))
+      }
     }
 
   }
