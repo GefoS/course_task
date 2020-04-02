@@ -1,0 +1,13 @@
+/project/
+/src/main/scala/spark/exercise/Lab11WindowFunction.scala
+/src/main/scala/spark/exercise/Lab10ProcessingTables.scala
+/src/main/scala/spark/exercise/domain/
+/src/main/scala/spark/exercise/Lab9ProcessingTables.scala
+/src/main/scala/spark/SparkExample.scala
+/src/main/scala/spark/exercise/Lab8TableColumns.scala
+/src/main/scala/spark/exercise/Lab12SQLCollections.scala
+/src/main/scala/spark/exercise/Lab7_SQLTables.scala
+/src/main/scala/spark/exercise/Parameters.scala
+/build.sbt
+/target/
+/src/test/
